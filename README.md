@@ -25,6 +25,12 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## Demo online
+
+Demo online: [https://demo-nestjs-myw0.onrender.com/](https://demo-nestjs-myw0.onrender.com/)
+
+Documentación de la API: [https://demo-nestjs-myw0.onrender.com/api](https://demo-nestjs-myw0.onrender.com/api)
+
 ## Project setup
 
 ```bash
@@ -64,16 +70,42 @@ $ npm run test:cov
 
 ## Deployment
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Para una prueba sencilla puedes usar [Render](https://render.com), conectando
+este repositorio de GitHub como un **Web Service**.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Configura estas variables en el servicio:
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+```env
+DATABASE_URL=postgresql://postgres.bkcylzjbraxlhubixgbt:TU_PASSWORD@aws-1-eu-west-1.pooler.supabase.com:5432/postgres
+JWT_SECRET=una-clave-secreta-larga-y-segura
+NODE_ENV=production
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Configura el servicio con estos valores:
+
+```text
+Build Command: npm install && npm run build
+Start Command: npm run start:prod
+```
+
+Añade `DATABASE_URL`, `JWT_SECRET` y `NODE_ENV=production` en las variables de
+entorno de Render. No incluyas la contraseña de Supabase en el repositorio.
+
+Después del deploy, deja la URL pública en esta sección para probarla:
+
+```text
+Public URL: https://demo-nestjs-myw0.onrender.com/
+Health check: https://demo-nestjs-myw0.onrender.com/health
+Swagger: https://demo-nestjs-myw0.onrender.com/api
+Login: POST https://demo-nestjs-myw0.onrender.com/auth/login
+```
+
+En el plan gratuito, el servicio puede pausarse cuando no recibe tráfico y
+tardar unos segundos en responder al primer request. Las condiciones de los
+planes pueden cambiar.
+
+En producción `synchronize` está desactivado. La tabla `users` debe existir en
+Supabase antes de iniciar el servicio.
 
 ## Resources
 
