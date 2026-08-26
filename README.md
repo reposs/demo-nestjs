@@ -31,6 +31,11 @@
 $ npm install
 ```
 
+The `prepare` script automatically enables the native Git hooks after
+installation. They format staged files with Prettier before each commit and
+run the unit tests before each push. If needed, hooks can be enabled manually
+with `$ npm run setup:hooks`.
+
 ## Compile and run the project
 
 ```bash
