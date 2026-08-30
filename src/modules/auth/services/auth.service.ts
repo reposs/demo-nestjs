@@ -2,11 +2,12 @@ import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from '@/modules/auth/dto/login.dto';
+import { USERS_REPOSITORY } from '../../../users/constants';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject('USERS_REPOSITORY')
+    @Inject(USERS_REPOSITORY)
     private readonly usersRepository: {
       findByEmail: (email: string) => Promise<any>;
     },
