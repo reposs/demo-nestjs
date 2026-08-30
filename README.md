@@ -29,7 +29,7 @@
 
 Demo online: [https://demo-nestjs-myw0.onrender.com/](https://demo-nestjs-myw0.onrender.com/)
 
-Documentación de la API: [https://demo-nestjs-myw0.onrender.com/api](https://demo-nestjs-myw0.onrender.com/api)
+Documentación de la API: [https://demo-nestjs-myw0.onrender.com/docs](https://demo-nestjs-myw0.onrender.com/docs)
 
 ## Project setup
 
