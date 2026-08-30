@@ -10,9 +10,10 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { IUsersRepository } from './interfaces/users-repository.interface';
 
 @Injectable()
-export class UsersRepository implements OnModuleInit {
+export class UsersRepository implements OnModuleInit, IUsersRepository {
   constructor(
     @InjectRepository(User)
     private readonly repository: Repository<User>,
@@ -66,9 +67,16 @@ export class UsersRepository implements OnModuleInit {
     return safeUser;
   }
 
-  async update(id: string, data: UpdateUserDto): Promise<Omit<User, 'password'>> {
+  async update(
+    id: string,
+    data: UpdateUserDto,
+  ): Promise<Omit<User, 'password'>> {
     const user = await this.findById(id);
-    if (data.email && data.email !== user.email && (await this.findByEmail(data.email))) {
+    if (
+      data.email &&
+      data.email !== user.email &&
+      (await this.findByEmail(data.email))
+    ) {
       throw new ConflictException('Email already in use');
     }
 

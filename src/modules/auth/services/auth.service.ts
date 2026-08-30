@@ -3,14 +3,13 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from '@/modules/auth/dto/login.dto';
 import { USERS_REPOSITORY } from '../../../users/constants';
+import { IUsersRepository } from '../../../users/interfaces/users-repository.interface';
 
 @Injectable()
 export class AuthService {
   constructor(
     @Inject(USERS_REPOSITORY)
-    private readonly usersRepository: {
-      findByEmail: (email: string) => Promise<any>;
-    },
+    private readonly usersRepository: IUsersRepository,
     private readonly jwtService: JwtService,
   ) {}
 
