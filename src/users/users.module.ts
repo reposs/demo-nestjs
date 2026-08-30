@@ -11,8 +11,8 @@ import { UsersService } from './users.service';
   providers: [
     UsersRepository,
     UsersService,
-    { provide: 'USERS_READ_SERVICE', useExisting: UsersService },
+    { provide: 'USERS_REPOSITORY', useExisting: UsersRepository },
   ],
-  exports: [UsersService, 'USERS_READ_SERVICE'],
+  exports: [UsersService, 'USERS_REPOSITORY'],
 })
 export class UsersModule {}

@@ -6,15 +6,15 @@ import { LoginDto } from '@/modules/auth/dto/login.dto';
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject('USERS_READ_SERVICE')
-    private readonly usersRead: {
+    @Inject('USERS_REPOSITORY')
+    private readonly usersRepository: {
       findByEmail: (email: string) => Promise<any>;
     },
     private readonly jwtService: JwtService,
   ) {}
 
   async login(data: LoginDto) {
-    const user = await this.usersRead.findByEmail(data.email);
+    const user = await this.usersRepository.findByEmail(data.email);
     if (
       !user ||
       user.disabled ||
