@@ -13,6 +13,6 @@ import { UsersService } from './users.service';
     UsersService,
     { provide: 'USERS_REPOSITORY', useExisting: UsersRepository },
   ],
-  exports: [UsersService, 'USERS_REPOSITORY'],
+  exports: ['USERS_REPOSITORY'],
 })
 export class UsersModule {}
