@@ -10,11 +10,11 @@ describe('UsersService', () => {
     create: jest.fn(),
     update: jest.fn(),
     remove: jest.fn(),
-  };
+  } as any;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    usersService = new UsersService(repository as never);
+    usersService = new UsersService(repository);
   });
 
   it('delegates create to the repository', async () => {
@@ -24,12 +24,18 @@ describe('UsersService', () => {
       email: 'ada@example.com',
       password: 'password',
     };
-    repository.create.mockResolvedValue({ id: 'user-id', ...data });
-
-    await expect(usersService.create(data)).resolves.toEqual({
+    const createdUser = {
       id: 'user-id',
-      ...data,
-    });
+      firstname: data.firstname,
+      lastname: data.lastname,
+      email: data.email,
+      disabled: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    repository.create.mockResolvedValue(createdUser);
+
+    await expect(usersService.create(data)).resolves.toEqual(createdUser);
     expect(repository.create).toHaveBeenCalledWith(data);
   });
 

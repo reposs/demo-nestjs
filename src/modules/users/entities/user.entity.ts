@@ -5,30 +5,32 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  id: string;
 
   @Column({ length: 100 })
-  firstname!: string;
+  firstname: string;
 
   @Column({ length: 100 })
-  lastname!: string;
+  lastname: string;
 
   @Column({ unique: true, length: 255 })
-  email!: string;
+  email: string;
 
   @Column({ select: false })
-  password!: string;
+  @Exclude()
+  password: string;
 
-  @Column({ default: false })
-  disabled!: boolean;
+  @Column({ default: true })
+  disabled: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt!: Date;
+  createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt!: Date;
+  updatedAt: Date;
 }

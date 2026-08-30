@@ -2,7 +2,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
-import type { IUsersRepository } from '@/users/interfaces/users-repository.interface';
+import type { IUsersRepository } from '@/modules/users/interfaces/users-repository.interface';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -25,7 +25,7 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    authService = new AuthService(usersService as never, jwtService as never);
+    authService = new AuthService(usersService, jwtService as never);
   });
 
   it('returns an access token for valid credentials', async () => {
@@ -39,7 +39,7 @@ describe('AuthService', () => {
 
     expect(result).toEqual({ access_token: 'jwt-token' });
     expect(jwtService.signAsync).toHaveBeenCalledWith({
-      userId: '550e8400-e29b-41d4-a716-446655440000',
+      id: '550e8400-e29b-41d4-a716-446655440000',
       email: 'admin@example.com',
     });
   });
@@ -49,7 +49,7 @@ describe('AuthService', () => {
     ['a disabled user', { email: 'admin@example.com', disabled: true }],
   ])('rejects %s', async (_description, user) => {
     usersService.findByEmail.mockResolvedValue(
-      user == null ? null : makeUser(user as any),
+      user == null ? null : makeUser(user),
     );
 
     await expect(

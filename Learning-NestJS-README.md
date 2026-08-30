@@ -48,6 +48,7 @@ async function bootstrap() {
 
   /////////////////////////////////////////////////////////////////
   // Activa la validación automática de DTOs en toda la aplicación
+  // Activa la serialización automática (@Exclude, @Expose, etc.)
   /////////////////////////////////////////////////////////////////
   app.useGlobalPipes(
     new ValidationPipe({
@@ -56,6 +57,7 @@ async function bootstrap() {
       transform: true, // Transforma automáticamente los payloads al tipo del DTO
     }),
   );
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   /////////////////////////////////////////////////////////////////
 
   await app.listen(process.env.PORT ?? 3000);

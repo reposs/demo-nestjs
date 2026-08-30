@@ -12,20 +12,30 @@ describe('UsersRepository', () => {
     create: jest.fn(),
     save: jest.fn(),
     delete: jest.fn(),
-  };
+  } as any;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    usersRepository = new UsersRepository(repository as never);
+    usersRepository = new UsersRepository(repository);
   });
 
   it('finds a user by email including its password', async () => {
-    const user = { id: 'user-id', email: 'user@example.com', password: 'hash' };
+    const user = {
+      id: 'user-id',
+      firstname: 'Test',
+      lastname: 'User',
+      email: 'user@example.com',
+      password: 'hash',
+      disabled: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
     const queryBuilder = {
       addSelect: jest.fn().mockReturnThis(),
       where: jest.fn().mockReturnThis(),
-      getOne: jest.fn().mockResolvedValue(user),
+      getOne: jest.fn(),
     };
+    (queryBuilder.getOne as any).mockResolvedValue(user);
     repository.createQueryBuilder.mockReturnValue(queryBuilder);
 
     await expect(usersRepository.findByEmail(user.email)).resolves.toEqual(
@@ -37,14 +47,21 @@ describe('UsersRepository', () => {
   it('creates a user with a hashed password and hides it in the result', async () => {
     repository.create.mockImplementation((data) => ({
       id: 'user-id',
-      ...data,
+      firstname: data.firstname,
+      lastname: data.lastname,
+      email: data.email,
+      password: bcrypt.hashSync(data.password, 10),
+      disabled: data.disabled ?? false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }));
     repository.save.mockResolvedValue(undefined);
     repository.createQueryBuilder.mockReturnValue({
       addSelect: jest.fn().mockReturnThis(),
       where: jest.fn().mockReturnThis(),
-      getOne: jest.fn().mockResolvedValue(null),
+      getOne: jest.fn(),
     });
+    repository.createQueryBuilder().getOne.mockResolvedValue(null);
 
     const result = await usersRepository.create({
       firstname: 'Ada',
@@ -66,7 +83,10 @@ describe('UsersRepository', () => {
     repository.createQueryBuilder.mockReturnValue({
       addSelect: jest.fn().mockReturnThis(),
       where: jest.fn().mockReturnThis(),
-      getOne: jest.fn().mockResolvedValue({ email: 'ada@example.com' }),
+      getOne: jest.fn(),
+    });
+    repository.createQueryBuilder().getOne.mockResolvedValue({
+      email: 'ada@example.com',
     });
 
     await expect(

@@ -7,10 +7,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
-import { IUsersRepository } from './interfaces/users-repository.interface';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
+import { User } from '../entities/user.entity';
+import type { IUsersRepository } from '../interfaces/users-repository.interface';
 
 @Injectable()
 export class UsersRepository implements OnModuleInit, IUsersRepository {
@@ -60,10 +60,10 @@ export class UsersRepository implements OnModuleInit, IUsersRepository {
       lastname: data.lastname,
       email: data.email,
       password: bcrypt.hashSync(data.password, 10),
-      disabled: data.disabled ?? false,
     });
     await this.repository.save(user);
-    const { password, ...safeUser } = user;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _password, ...safeUser } = user;
     return safeUser;
   }
 
@@ -96,7 +96,8 @@ export class UsersRepository implements OnModuleInit, IUsersRepository {
       user.disabled = data.disabled;
     }
     await this.repository.save(user);
-    const { password, ...safeUser } = user;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _password, ...safeUser } = user;
     return safeUser;
   }
 

@@ -1,14 +1,24 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from './auth/auth.module';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
+import { HealthModule } from '@/modules/health/health.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    /////////////////////////////////////
+    // dotenv ///////////////////////////
+    /////////////////////////////////////
+    ConfigModule.forRoot({
+      isGlobal: true,
+      // envFilePath: '.env', // Ruta por defecto si está en la raíz
+    }),
+    /////////////////////////////////////
+
+    ///////////////////////////////////////////
+    // Conectar con Bases de datos con TypeORM
+    ///////////////////////////////////////////
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
@@ -19,10 +29,12 @@ import { UsersModule } from './users/users.module';
         ssl: { rejectUnauthorized: false },
       }),
     }),
+    /////////////////////////////////////
+    HealthModule,
     AuthModule,
     UsersModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
