@@ -32,7 +32,7 @@ async function bootstrap() {
   // Creación del documento Swagger
   const document = SwaggerModule.createDocument(app, config);
   // Ruta pública donde se montará la interfaz visual (e.g., http://localhost:3000/docs)
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup('api', app, document);
   //////////////////////////////////////////////////
 
   await app.listen(process.env.PORT ?? 3000);
