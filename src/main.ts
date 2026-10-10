@@ -1,40 +1,58 @@
 import { NestFactory, Reflector } from '@nestjs/core';
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  Logger,
+  ValidationPipe,
+} from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
 
-  /////////////////////////////////////////////////////////////////
-  // Activa la validación automática de DTOs en toda la aplicación
-  // Activa la serialización automática (@Exclude, @Expose, etc.)
-  /////////////////////////////////////////////////////////////////
+  // Enable graceful shutdown
+  app.enableShutdownHooks();
+
+  // Enable CORS
+  app.enableCors();
+
+  // Global exception filter for RFC 7807 formatted error responses
+  app.useGlobalFilters(new AllExceptionsFilter());
+
+  // Global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // Elimina del body cualquier propiedad no definida en el DTO
-      forbidNonWhitelisted: true, // Lanza un error 400 si el cliente envía propiedades no permitidas
-      transform: true, // Transforma automáticamente los payloads al tipo del DTO
+      whitelist: true, // Strips non-whitelisted properties
+      forbidNonWhitelisted: true, // Throws 400 if client sends unrecognized properties
+      transform: true, // Transforms payload to DTO instance
+      transformOptions: { enableImplicitConversion: true },
     }),
   );
+
+  // Global serialization interceptor (@Exclude, @Expose)
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
-  /////////////////////////////////////////////////////////////////
 
-  //////////////////////////////////////////////////
-  // Configuración de swagger para la documentación
-  //////////////////////////////////////////////////
+  // Swagger OpenAPI documentation
   const config = new DocumentBuilder()
-    .setTitle('API de Mi Aplicación')
-    .setDescription('Documentación interactiva de la API de producción')
+    .setTitle('Demo NestJS API')
+    .setDescription('Interactive OpenAPI production documentation')
     .setVersion('1.0')
-    .addBearerAuth() // Habilita el botón de autorización si usas JWT
+    .addBearerAuth()
     .build();
-  // Creación del documento Swagger
-  const document = SwaggerModule.createDocument(app, config);
-  // Ruta pública donde se montará la interfaz visual (e.g., http://localhost:3000/docs)
-  SwaggerModule.setup('api', app, document);
-  //////////////////////////////////////////////////
 
-  await app.listen(process.env.PORT ?? 3000);
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
+  const port = process.env.PORT ?? 3000;
+  await app.listen(port);
+  logger.log(`Application is running on port ${port}`);
+  logger.log(`Swagger documentation available at /api`);
 }
-bootstrap();
+
+bootstrap().catch((err: unknown) => {
+  const logger = new Logger('Bootstrap');
+  logger.error('Fatal error starting application', err);
+  process.exit(1);
+});

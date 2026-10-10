@@ -7,29 +7,29 @@ import { HealthModule } from '@/modules/health/health.module';
 
 @Module({
   imports: [
-    /////////////////////////////////////
-    // dotenv ///////////////////////////
-    /////////////////////////////////////
     ConfigModule.forRoot({
       isGlobal: true,
-      // envFilePath: '.env', // Ruta por defecto si está en la raíz
     }),
-    /////////////////////////////////////
 
-    ///////////////////////////////////////////
-    // Conectar con Bases de datos con TypeORM
-    ///////////////////////////////////////////
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        url: configService.getOrThrow<string>('DATABASE_URL'),
-        autoLoadEntities: true,
-        synchronize: configService.get('NODE_ENV') !== 'production',
-        ssl: { rejectUnauthorized: false },
-      }),
+      useFactory: (configService: ConfigService) => {
+        const databaseUrl = configService.getOrThrow<string>('DATABASE_URL');
+        const isProduction = configService.get('NODE_ENV') === 'production';
+        const isLocalDb =
+          databaseUrl.includes('localhost') ||
+          databaseUrl.includes('127.0.0.1');
+
+        return {
+          type: 'postgres',
+          url: databaseUrl,
+          autoLoadEntities: true,
+          synchronize: !isProduction,
+          ssl: isLocalDb ? false : { rejectUnauthorized: false },
+        };
+      },
     }),
-    /////////////////////////////////////
+
     HealthModule,
     AuthModule,
     UsersModule,

@@ -4,14 +4,13 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { USERS_REPOSITORY } from '@/modules/users/constants/users-repository.constant';
 import type { IUsersRepository } from '@/modules/users/interfaces/users-repository.interface';
-import * as bcrypt from 'bcrypt';
 
 export interface JwtPayload {
-  userId: string;
+  id?: string;
+  userId?: string;
   email: string;
   iat?: number;
   exp?: number;
-  [key: string]: any;
 }
 
 @Injectable()
@@ -28,7 +27,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: JwtPayload) {
+  async validate(payload: JwtPayload): Promise<JwtPayload> {
     const user = await this.usersRepository.findByEmail(payload.email);
     if (!user || user.disabled) {
       throw new UnauthorizedException('Invalid credentials');

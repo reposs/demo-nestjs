@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsBoolean,
   IsEmail,
@@ -8,30 +8,42 @@ import {
 } from 'class-validator';
 
 export class UpdateUserDto {
-  @ApiPropertyOptional({ example: 'firstname_1_updated' })
+  @ApiPropertyOptional({ example: 'Ada', description: 'Updated first name' })
   @IsOptional()
   @IsString()
   @MinLength(2)
   firstname?: string;
 
-  @ApiPropertyOptional({ example: 'lastname_1_updated' })
+  @ApiPropertyOptional({
+    example: 'Lovelace',
+    description: 'Updated last name',
+  })
   @IsOptional()
   @IsString()
   @MinLength(2)
   lastname?: string;
 
-  @ApiPropertyOptional({ example: 'email_1@example.com' })
+  @ApiPropertyOptional({
+    example: 'ada@example.com',
+    description: 'Updated email address',
+  })
   @IsOptional()
   @IsEmail()
   email?: string;
 
-  @ApiPropertyOptional({ example: 'password_1' })
+  @ApiPropertyOptional({
+    example: 'newSecurePassword123',
+    description: 'Updated password (min 8 characters)',
+  })
   @IsOptional()
   @IsString()
   @MinLength(8)
   password?: string;
 
-  @ApiProperty({ example: true, default: true, required: false })
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Updated account disabled status',
+  })
   @IsOptional()
   @IsBoolean()
   disabled?: boolean;

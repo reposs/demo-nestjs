@@ -1,19 +1,31 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, Max, Min } from 'class-validator';
 
 export class PaginatorQueryDto {
-  @ApiProperty({ example: 0, required: false, default: 0 })
+  @ApiPropertyOptional({
+    example: 0,
+    default: 0,
+    minimum: 0,
+    description: 'Number of items to skip',
+  })
   @IsOptional()
   @IsInt()
+  @Min(0)
   @Type(() => Number)
   skip: number = 0;
 
-  @ApiProperty({ example: 2, required: false, default: 2 })
+  @ApiPropertyOptional({
+    example: 10,
+    default: 10,
+    minimum: 1,
+    maximum: 100,
+    description: 'Maximum number of items to return (max: 100)',
+  })
   @IsOptional()
   @IsInt()
   @Min(1)
-  @Max(10)
+  @Max(100)
   @Type(() => Number)
-  limit: number = 2;
+  limit: number = 10;
 }

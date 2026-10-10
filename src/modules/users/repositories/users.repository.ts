@@ -11,6 +11,9 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { User } from '../entities/user.entity';
 import type { IUsersRepository } from '../interfaces/users-repository.interface';
+import { PaginatorQueryDto } from '@/common/dto/paginator-query.dto';
+
+const BCRYPT_SALT_ROUNDS = 10;
 
 @Injectable()
 export class UsersRepository implements OnModuleInit, IUsersRepository {
@@ -20,7 +23,8 @@ export class UsersRepository implements OnModuleInit, IUsersRepository {
   ) {}
 
   async onModuleInit(): Promise<void> {
-    if (!(await this.findByEmail('admin@example.com'))) {
+    const adminUser = await this.findByEmail('admin@example.com');
+    if (!adminUser) {
       await this.create({
         firstname: 'Admin',
         lastname: 'User',
@@ -30,14 +34,25 @@ export class UsersRepository implements OnModuleInit, IUsersRepository {
     }
   }
 
-  async findAll(): Promise<Omit<User, 'password'>[]> {
-    return this.repository.find();
+  async findAll(query?: PaginatorQueryDto): Promise<Omit<User, 'password'>[]> {
+    if (!query) {
+      return this.repository.find({
+        order: { createdAt: 'DESC' },
+      });
+    }
+
+    const { skip = 0, limit = 10 } = query;
+    return this.repository.find({
+      skip,
+      take: limit,
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async findById(id: string): Promise<User> {
     const user = await this.repository.findOne({ where: { id } });
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(`User with ID ${id} not found`);
     }
     return user;
   }
@@ -51,17 +66,20 @@ export class UsersRepository implements OnModuleInit, IUsersRepository {
   }
 
   async create(data: CreateUserDto): Promise<Omit<User, 'password'>> {
-    if (await this.findByEmail(data.email)) {
+    const existing = await this.findByEmail(data.email);
+    if (existing) {
       throw new ConflictException('Email already in use');
     }
 
+    const hashedPassword = await bcrypt.hash(data.password, BCRYPT_SALT_ROUNDS);
     const user = this.repository.create({
       firstname: data.firstname,
       lastname: data.lastname,
       email: data.email,
-      password: bcrypt.hashSync(data.password, 10),
+      password: hashedPassword,
     });
     await this.repository.save(user);
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _password, ...safeUser } = user;
     return safeUser;
@@ -90,12 +108,13 @@ export class UsersRepository implements OnModuleInit, IUsersRepository {
       user.email = data.email;
     }
     if (data.password !== undefined) {
-      user.password = bcrypt.hashSync(data.password, 10);
+      user.password = await bcrypt.hash(data.password, BCRYPT_SALT_ROUNDS);
     }
     if (data.disabled !== undefined) {
       user.disabled = data.disabled;
     }
     await this.repository.save(user);
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _password, ...safeUser } = user;
     return safeUser;
@@ -104,7 +123,7 @@ export class UsersRepository implements OnModuleInit, IUsersRepository {
   async remove(id: string): Promise<void> {
     const result = await this.repository.delete(id);
     if (!result.affected) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(`User with ID ${id} not found`);
     }
   }
 }

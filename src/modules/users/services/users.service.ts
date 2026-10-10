@@ -1,33 +1,38 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
-import { UsersRepository } from '../repositories/users.repository';
+import { USERS_REPOSITORY } from '../constants/users-repository.constant';
+import type { IUsersRepository } from '../interfaces/users-repository.interface';
+import { PaginatorQueryDto } from '@/common/dto/paginator-query.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    @Inject(USERS_REPOSITORY)
+    private readonly usersRepository: IUsersRepository,
+  ) {}
 
-  findAll() {
-    return this.usersRepository.findAll();
+  findAll(query?: PaginatorQueryDto) {
+    return this.usersRepository.findAll(query);
   }
 
   findById(id: string) {
     return this.usersRepository.findById(id);
   }
 
-  async findByEmail(email: string) {
+  findByEmail(email: string) {
     return this.usersRepository.findByEmail(email);
   }
 
-  async create(data: CreateUserDto) {
+  create(data: CreateUserDto) {
     return this.usersRepository.create(data);
   }
 
-  async update(id: string, data: UpdateUserDto) {
+  update(id: string, data: UpdateUserDto) {
     return this.usersRepository.update(id, data);
   }
 
-  async remove(id: string) {
+  remove(id: string) {
     return this.usersRepository.remove(id);
   }
 }
