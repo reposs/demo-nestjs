@@ -96,7 +96,7 @@ Después del deploy, deja la URL pública en esta sección para probarla:
 ```text
 Public URL: https://demo-nestjs-myw0.onrender.com/
 Health check: https://demo-nestjs-myw0.onrender.com/health
-Swagger: https://demo-nestjs-myw0.onrender.com/api
+Swagger: https://demo-nestjs-myw0.onrender.com/docs
 Login: POST https://demo-nestjs-myw0.onrender.com/auth/login
 ```
 

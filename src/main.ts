@@ -43,12 +43,12 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('docs', app, document);
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
   logger.log(`Application is running on port ${port}`);
-  logger.log(`Swagger documentation available at /api`);
+  logger.log(`Swagger documentation available at /docs`);
 }
 
 bootstrap().catch((err: unknown) => {
